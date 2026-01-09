@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 from typing import Iterable
 
+from . import supabase_store
+
 DEFAULT_INVENTORY = {"items": []}
 
 
@@ -12,6 +14,8 @@ def _inventory_path() -> Path:
 
 
 def load_inventory() -> list[str]:
+    if supabase_store.is_enabled():
+        return supabase_store.list_items("inventory_items")
     path = _inventory_path()
     if not path.exists():
         save_inventory([])
@@ -22,6 +26,9 @@ def load_inventory() -> list[str]:
 
 
 def save_inventory(items: Iterable[str]) -> None:
+    if supabase_store.is_enabled():
+        supabase_store.replace_items("inventory_items", items)
+        return
     path = _inventory_path()
     cleaned = sorted({item.strip().lower() for item in items if item.strip()})
     payload = {"items": cleaned}
@@ -29,6 +36,9 @@ def save_inventory(items: Iterable[str]) -> None:
 
 
 def add_item(item: str) -> list[str]:
+    if supabase_store.is_enabled():
+        supabase_store.add_item("inventory_items", item)
+        return load_inventory()
     items = load_inventory()
     items.append(item)
     save_inventory(items)
@@ -36,6 +46,9 @@ def add_item(item: str) -> list[str]:
 
 
 def remove_item(item: str) -> list[str]:
+    if supabase_store.is_enabled():
+        supabase_store.remove_item("inventory_items", item)
+        return load_inventory()
     items = [i for i in load_inventory() if i != item.strip().lower()]
     save_inventory(items)
     return items

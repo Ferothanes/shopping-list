@@ -4,12 +4,15 @@ import json
 from pathlib import Path
 from typing import Iterable
 
+from . import supabase_store
 
 def _cart_path() -> Path:
     return Path(__file__).resolve().parents[1] / "shopping_cart.json"
 
 
 def load_cart() -> list[str]:
+    if supabase_store.is_enabled():
+        return supabase_store.list_items("shopping_cart_items")
     path = _cart_path()
     if not path.exists():
         save_cart([])
@@ -20,6 +23,9 @@ def load_cart() -> list[str]:
 
 
 def save_cart(items: Iterable[str]) -> None:
+    if supabase_store.is_enabled():
+        supabase_store.replace_items("shopping_cart_items", items)
+        return
     path = _cart_path()
     cleaned = sorted({item.strip().lower() for item in items if item.strip()})
     payload = {"items": cleaned}
@@ -27,6 +33,9 @@ def save_cart(items: Iterable[str]) -> None:
 
 
 def add_to_cart(item: str) -> list[str]:
+    if supabase_store.is_enabled():
+        supabase_store.add_item("shopping_cart_items", item)
+        return load_cart()
     items = load_cart()
     items.append(item)
     save_cart(items)
@@ -34,6 +43,9 @@ def add_to_cart(item: str) -> list[str]:
 
 
 def remove_from_cart(item: str) -> list[str]:
+    if supabase_store.is_enabled():
+        supabase_store.remove_item("shopping_cart_items", item)
+        return load_cart()
     items = [i for i in load_cart() if i != item.strip().lower()]
     save_cart(items)
     return items
