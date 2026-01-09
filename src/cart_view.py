@@ -24,17 +24,12 @@ def render_cart() -> None:
                         row_cols = st.columns(5)
                         for col, item in zip(row_cols, row_items):
                             with col:
-                                item_cols = st.columns([4, 1])
-                                with item_cols[0]:
-                                    st.markdown(
-                                        f"<div class='item-chip'>{item}</div>",
-                                        unsafe_allow_html=True,
-                                    )
-                                with item_cols[1]:
-                                    if st.button(">", key=f"to_cart_{row_start}_{item}"):
-                                        remove_item(item)
-                                        add_to_cart(item)
-                                        st.rerun()
+                                if st.button(
+                                    item, key=f"to_cart_{row_start}_{item}", use_container_width=True
+                                ):
+                                    remove_item(item)
+                                    add_to_cart(item)
+                                    st.rerun()
 
     with top_col_right:
         with st.container():
@@ -66,15 +61,12 @@ def render_cart() -> None:
                         row_cols = st.columns(5)
                         for col, item in zip(row_cols, row_items):
                             with col:
-                                item_cols = st.columns([4, 1])
-                                with item_cols[0]:
-                                    st.markdown(
-                                        f"<div class='item-chip'>{item}</div>",
-                                        unsafe_allow_html=True,
-                                    )
-                                with item_cols[1]:
-                                    if st.button("x", key=f"remove_cart_{row_start}_{item}"):
-                                        remove_from_cart(item)
-                                        if remove_mode == "Return to fridge":
-                                            add_item(item)
-                                        st.rerun()
+                                if st.button(
+                                    item,
+                                    key=f"remove_cart_{row_start}_{item}",
+                                    use_container_width=True,
+                                ):
+                                    remove_from_cart(item)
+                                    if remove_mode == "Return to fridge":
+                                        add_item(item)
+                                    st.rerun()
