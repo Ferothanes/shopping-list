@@ -18,7 +18,7 @@ inventory = load_inventory()
 
 view_choice = st.radio(
     "View",
-    ["Recipe Finder", "Shopping Cart"],
+    ["Shopping Cart", "Recipe Finder"],
     horizontal=True,
     label_visibility="collapsed",
 )
